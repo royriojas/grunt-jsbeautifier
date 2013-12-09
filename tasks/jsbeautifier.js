@@ -91,7 +91,7 @@ module.exports = function(grunt) {
                     return;
                 }
 
-                beautify(src, config, actionHandler);
+                beautify(src, config, actionHandler, params);
                 fileCount++;
                 callback();
             }, 10);
@@ -104,7 +104,7 @@ module.exports = function(grunt) {
         }
     });
 
-    function beautify(file, config, actionHandler) {
+    function beautify(file, config, actionHandler, params) {
         var setup = getBeautifierSetup(file, config);
         if (!setup) {
             return;
@@ -121,6 +121,18 @@ module.exports = function(grunt) {
         if (addNewLine) {
             result += '\n';
         }
+
+        var onBeautified = params.onBeautified;
+        if (onBeautified) {
+            var res = onBeautified(result, { config : config, file : file, params : params });
+            if (typeof res !== "string" || res === "") {
+                grunt.log.warn('onBeautified returned no valid string content'.cyan + '. Using the original beautified result');                
+            }
+            else {
+                result = res;
+            }
+        }
+
         grunt.verbose.ok();
         /*jshint eqeqeq: false */
         if (original != result) {
