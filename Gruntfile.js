@@ -6,10 +6,28 @@ module.exports = function(grunt) {
             default: {
                 src: ["<%= jshint.files %>", "!test/fixtures/**"]
             },
-            hasNotBeenBeautified: {
+            onVerificationFailed: {
                 src: ["test/fixtures/not-been-beautified.js"],
                 options: {
-                    mode: "VERIFY_ONLY"
+                    mode: "VERIFY_ONLY",
+                    onVerificationFailed: function(src, params) {
+                        grunt.log.warn('this message was added using onVerifyFailed handler');
+                    }
+                }
+            },
+            onBeautified: {
+                src: ["test/fixtures/beautified.js"],
+                options: {
+                    mode: "VERIFY_ONLY",
+                    onBeautified: function(content, params) {
+                        return content.replace(/!!\s/g, function() {
+                            return '!!';
+                        })
+                            .replace(/\(\s!!/g, function() {
+                                grunt.log.writeln('replacing "( !!" with "!!');
+                                return '(!!';
+                            });
+                    }
                 }
             },
             hasBeenBeautified: {
@@ -77,7 +95,7 @@ module.exports = function(grunt) {
             all: ["test/**/*.js"]
         },
         jshint: {
-            files: ["package.json", "Gruntfile.js", "tasks/**/*.js", "test/**/*.js"],
+            files: ["package.json", "Gruntfile.js", "tasks/**/*.js", "test/**/*.js", "!test/fixtures/beautified.js"],
             options: {
                 curly: true,
                 eqeqeq: true,

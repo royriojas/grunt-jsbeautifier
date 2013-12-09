@@ -26,11 +26,20 @@ module.exports = function(grunt) {
         var fileCount = 0;
         var changedFileCount = 0;
 
-        function verifyActionHandler(src) {
+        function verifyActionHandler(src, result, params, config) {
+            var onVerificationFailed = params.onVerificationFailed;
+            if (onVerificationFailed) {
+                onVerificationFailed(result, {
+                    file: src,
+                    params: params,
+                    config: config
+                });
+            }
             grunt.fail.warn(src.cyan + ' was not beautified');
         }
 
-        function verifyAndWriteActionHandler(src, result) {
+        function verifyAndWriteActionHandler(src, result, params, config) {
+            grunt.log.writeln('file ' + src.cyan + ' needed beautification... updating it with beautified content');
             grunt.file.write(src, result);
             changedFileCount++;
         }
@@ -124,11 +133,14 @@ module.exports = function(grunt) {
 
         var onBeautified = params.onBeautified;
         if (onBeautified) {
-            var res = onBeautified(result, { config : config, file : file, params : params });
+            var res = onBeautified(result, {
+                config: config,
+                file: file,
+                params: params
+            });
             if (typeof res !== "string" || res === "") {
-                grunt.log.warn('onBeautified returned no valid string content'.cyan + '. Using the original beautified result');                
-            }
-            else {
+                grunt.log.warn('onBeautified returned no valid string content'.cyan + '. Using the original beautified result');
+            } else {
                 result = res;
             }
         }
@@ -136,7 +148,7 @@ module.exports = function(grunt) {
         grunt.verbose.ok();
         /*jshint eqeqeq: false */
         if (original != result) {
-            actionHandler(file, result);
+            actionHandler(file, result, params, config);
         }
     }
 

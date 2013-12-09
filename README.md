@@ -97,6 +97,40 @@ The file path (relative to your process's cwd) to the config file. This is usual
       files: ["src/**/*.js"],
       options: {
           config: "path/to/configFile",
+          // Called after the beautify has been done on a file.
+          // parameters of the callback
+          // content ==> the beautified content, which should be returned 
+          // from the function after applying some transformation if required.
+          //
+          // the args is an object with the following fields
+          // args.file ==> the path to the file
+          // args.config ==> the config used to call to js-beautify
+          // args.params ==> the parameters passed to jsbeautifier
+          //
+          // returns a string. This content is going to be saved to file
+          onBeautified : function (content, args){
+            // modify the beautified content to match our custom style guidelines
+            // or to fix some js-beautify bug
+            // return content.replace(/!!\s/g, function () {
+            //  grunt.log.writeln('replacing "!! " with "!!');
+            //  return '!!';
+            // });
+            return content;
+          },
+          // Called when the validation fails when the mode is VERIFY_ONLY.
+          // parameters of the callback
+          // content ==> the beautified content.
+
+          // the args is an object with the following fields
+          // args.file ==> the path to the file
+          // args.config ==> the config used to call to js-beautify
+          // args.params ==> the parameters passed to jsbeautifier
+          // returns nothing
+          onVerificationFailed : function (content, args) {
+            // doSomething to let your users know that some file has failed validation
+            // for example
+            grunt.log.warn('the file ===> ' + args.file + ' needs beautification, run grunt jsbeautifier --mode="VERIFY_AND_WRITE"');
+          },
           html: {
               braceStyle: "collapse",
               indentChar: " ",
@@ -171,6 +205,7 @@ jsbeautifier: {
 ```
 
 ## Release History
+* 0.2.5: Added two callbacks onBeautified and onValidationFailed to support modifying the beautified output and display custom errors on failure. Also use more specific version of dependencies.
 * 0.2.4: Support custom file types other than js, json, css & html. Use latest versions for dependencies [23](https://github.com/vkadam/grunt-jsbeautifier/issues/23), [26](https://github.com/vkadam/grunt-jsbeautifier/issues/26)
 * 0.2.3: Always use latest version of js-beautify. [21](https://github.com/vkadam/grunt-jsbeautifier/issues/21)
 * 0.2.2: Configuration is now lint happy. Options can be specified in cameCase, [17](https://github.com/vkadam/grunt-jsbeautifier/issues/17)
