@@ -46,7 +46,7 @@ module.exports = function(grunt) {
             regex = entry.regex;
           if (count > 0) {
             var msg = formatter('Replacing {0} with {1}, {2} time(s) on file {3}', regex, key, count, args.file);
-            console.log(msg);
+            //console.log(msg);
             grunt.verbose.writeln(msg);
           }
         });
