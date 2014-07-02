@@ -12,47 +12,53 @@ module.exports = function(grunt) {
 
 
 
-    var fixFormatErrors = function (content, args) {
+    var fixFormatErrors = function(content, args) {
         var replacements = [{
-            replace : /!!\s/g, // double bang with one space after
-            using : '!!' // removes the extra space at the end leaving only the double bang.
+            replace: /!!\s/g, // double bang with one space after
+            using: '!!' // removes the extra space at the end leaving only the double bang.
         }, {
-            replace : /\(\sfunction/g, // extra space in anonymous functions passed as arguments
-            using : '(function' // removes the extra space
+            replace: /\(\sfunction/g, // extra space in anonymous functions passed as arguments
+            using: '(function' // removes the extra space
         }, {
-            replace : /\)\s\)/g,  // closing parenthesis with an space in the middle
-            using : '))' // remove the middle space
+            replace: /\)\s\)/g, // closing parenthesis with an space in the middle
+            using: '))' // remove the middle space
+        }, {
+            replace: /\.\s+continue\s\(/g,
+            using: '.continue('
+        }, {
+            replace: /\.\s+catch\s\(/g,
+            using: '.catch('
         }];
 
         var counts = {};
-        replacements.forEach(function (entry) {
-          var token = entry.using,
-            regex = entry.replace;
+        replacements.forEach(function(entry) {
+            var token = entry.using,
+                regex = entry.replace;
 
-          counts[token] = {
-            count: 0,
-            regex: regex
-          };
-          content = content.replace(regex, function () {
-            counts[token].count++;
-            return token;
-          });
+            counts[token] = {
+                count: 0,
+                regex: regex
+            };
+            content = content.replace(regex, function() {
+                counts[token].count++;
+                return token;
+            });
         });
 
-        Object.keys(counts).forEach(function (key) {
-          //grunt.log.writeln('Replacing ' + counts[key].regex + ' with: ' + key  + ' ' + )
-          var entry = counts[key],
-            count = entry.count,
-            regex = entry.regex;
-          if (count > 0) {
-            var msg = formatter('Replacing {0} with {1}, {2} time(s) on file {3}', regex, key, count, args.file);
-            //console.log(msg);
-            grunt.verbose.writeln(msg);
-          }
+        Object.keys(counts).forEach(function(key) {
+            //grunt.log.writeln('Replacing ' + counts[key].regex + ' with: ' + key  + ' ' + )
+            var entry = counts[key],
+                count = entry.count,
+                regex = entry.regex;
+            if (count > 0) {
+                var msg = formatter('Replacing {0} with {1}, {2} time(s) on file {3}', regex, key, count, args.file);
+                //console.log(msg);
+                grunt.verbose.writeln(msg);
+            }
         });
 
         return content;
-      };
+    };
 
 
     // Please see the grunt documentation for more information regarding task and
@@ -178,10 +184,10 @@ module.exports = function(grunt) {
         }
 
         result = fixFormatErrors(result, {
-                config: config,
-                file: file,
-                params: params
-            });
+            config: config,
+            file: file,
+            params: params
+        });
 
         var onBeautified = params.onBeautified;
         if (onBeautified) {

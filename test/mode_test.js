@@ -28,7 +28,7 @@ exports["mode_test"] = {
             });
     },
 
-    "Verify using onBeautified handler to keep '!! ' to be '!!' (sticking to the operator)": function(test) {
+    "Verify using onBeautified handler to keep '!!' to be '!!' (sticking to the operator)": function(test) {
         test.expect(1);
         exec("grunt jsbeautifier:onBeautified", {
                 cwd: __dirname + "/../"
